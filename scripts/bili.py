@@ -321,9 +321,11 @@ def publish_article(args, client=None, quiet: bool = False) -> dict[str, Any]:
             else:
                 msg = str(resp.get("message", "") if isinstance(resp, dict) else resp)[:200]
                 status = "submit_blocked"
+                code = resp.get("code") if isinstance(resp, dict) else None
                 result["error"] = (
-                    f"公开提交被拒（HTTP {http_status}，通常 412 为反爬风控）。草稿已保存，"
-                    f"请在网页编辑器完成发布。详情: {msg}"
+                    f"公开提交被拒（HTTP {http_status}，code {code}；风控码常见 412 / -352）。"
+                    f"草稿已保存，不要重试同一接口；可改用 opus_browser.py publish-draft --confirm "
+                    f"公开发布，或在网页编辑器完成发布。详情: {msg}"
                 )
                 warn(result["error"])
 

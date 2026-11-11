@@ -48,7 +48,7 @@ allowed-tools: "Bash,Read,Write,WebFetch"
    用 `BILI_AUTH_PROVIDER=connector` 时凭据由外部注入、只在内存中。
    两种来源都绝不打印 Cookie、绝不写进日志/预览/文档、绝不提交到版本库；
    Cookie 只发往白名单域名。详见「鉴权 Provider」。
-5. **不规避风控**：`article/submit` 返回 412 时立即停止，返回已保存的草稿链接让用户到网页发布，
+5. **不规避风控**：`article/submit` 返回 412 / `-352` 时立即停止，返回已保存的草稿链接让用户到网页发布，
    绝不循环重试。内容需合规，转载须如实声明。
 6. **不删用户内容**：技能只列出草稿，不提供删除命令。
 
@@ -123,7 +123,7 @@ $PY "$BILI" publish --file article.md
 # 只保存草稿（推荐，稳定且可人工复核）
 $PY "$BILI" publish --file article.md --confirm
 
-# 公开发布（需用户二次确认；风控 412 时会自动降级为草稿）
+# 公开发布（需用户二次确认；风控 412/-352 时会自动降级为草稿）
 $PY "$BILI" publish --file article.md --publish --confirm
 ```
 
@@ -357,7 +357,9 @@ B 站专栏后端不渲染 Markdown 表格，发布前把表格转成结构化�
 
 ## 失败与降级
 
-- 提交被 412 风控拦截：草稿已保存，返回 `edit_url`，到网页编辑器完成发布，**不要重试**。
+- 提交被 412 / `-352` 风控拦截：草稿已保存，返回 `edit_url`，**不要重试同一接口**；
+  优先用 `opus_browser.py publish-draft --confirm` 公开发布该草稿（-352 后此路径实测可通），
+  或到网页编辑器完成发布。
 - 图片上传失败：默认中止；可用 `--skip-failed-images` 跳过。
 - 草稿满 999（`37106`）：`drafts` 查看后到创作中心网页手动清理。
 - 接口变更：用 `build` 生成 HTML → 复制粘贴到网页编辑器；
