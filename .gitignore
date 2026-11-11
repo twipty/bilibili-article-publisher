@@ -1,0 +1,20 @@
+__pycache__/
+*.py[cod]
+*.log
+.env
+.env.*
+secrets/
+*.secret
+
+# 登录凭证与一次性二维码，绝不入库
+login_qr.png
+qr_pending.json
+bili-login-qr*.png
+cookies.txt
+
+# 本地产物
+outputs/
+out/
+dist/
+*.zip
+.DS_Store
